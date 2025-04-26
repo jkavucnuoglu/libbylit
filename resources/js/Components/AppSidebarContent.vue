@@ -23,6 +23,7 @@ const navigationConfig = [
         label: 'Platform',
         items: [
             {name: 'Dashboard', icon: 'lucide:layout-dashboard', route: 'dashboard'},
+            {name: 'Suppliers', icon: 'lucide:truck', route: 'suppliers.index'},
             {name: 'Inventory', icon: 'lucide:boxes', route: 'inventory.index'},
             {name: 'Settings', icon: 'lucide:settings', route: 'profile.show'},
             // {name: 'Chat', icon: 'lucide:message-circle', route: 'chat.index'},
