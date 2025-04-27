@@ -14,11 +14,15 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
+            $table->integer('tenant_id')->index();
+            $table->string('account_number')->nullable();
+            $table->string('tax_id')->nullable();
             $table->string('name');
-            $table->string('website')->nullable();
+            $table->string('url')->nullable();
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->text('address')->nullable();
+            $table->jsonb('address')->nullable();
+
             $table->enum('status', array_map(fn($type) => $type->value(), StatusEnum::cases()))
                 ->default(StatusEnum::ACTIVE->value());
             $table->timestamps();

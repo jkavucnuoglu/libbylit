@@ -34,6 +34,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/rnd', [InventoryController::class, 'index'])->name('rnd.index');
+    Route::get('/bom', [InventoryController::class, 'index'])->name('bom.index');
 
     Route::delete('/auth/destroy/{provider}', [OauthController::class, 'destroy'])->name('oauth.destroy');
 
