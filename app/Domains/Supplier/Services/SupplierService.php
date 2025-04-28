@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Domains\Inventory\Services;
+namespace App\Domains\Supplier\Services;
 
-use App\Domains\Inventory\Models\Inventory;
 use App\Domains\Supplier\Models\Supplier;
-use Illuminate\Database\Eloquent\Collection;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SupplierService
 {
@@ -12,9 +13,24 @@ class SupplierService
     {
     }
 
-    public function getSuppliers(): Collection
+    public function getSuppliers(Request $request): LengthAwarePaginator
     {
-        return Supplier::all();
+        $query = Supplier::query();
+
+        if ($request->has('search') && $request->get('search') !== '' && $request->get('search') !== null) {
+            $query->where('name', 'like', $request->get('search') . '%');
+            $query->orWhere('email', 'like', $request->get('search') . '%');
+            $query->orWhere('phone', 'like', $request->get('search') . '%');
+            $query->orWhere('address', 'like', $request->get('search') . '%');
+            $query->orWhere('url', 'like', $request->get('search') . '%');
+        }
+
+        return $query->paginate(
+            $request->get('per_page', config('app.pagination.default.per_page')),
+            ['*'],
+            'page',
+            $request->get('page', 1)
+        );
     }
 
     public function getSupplierById(int $id): ?Supplier
@@ -27,16 +43,17 @@ class SupplierService
         return Supplier::create($data);
     }
 
-    public function updateSupplier(int $id, array $data): ?Supplier
+    public function updateSupplier($supplier, array $data): ?Supplier
     {
-        $supplier = $this->getSupplierById($id);
+        $supplier = Supplier::find($supplier);
 
-        if ($supplier) {
-            $supplier->update($data);
-            return $supplier;
+        if (!$supplier) {
+            throw new Exception('Supplier not found.');
         }
 
-        return null;
+        $supplier->update($data);
+
+        return $supplier;
     }
 
     public function deleteSupplier(int $id): bool
@@ -48,10 +65,5 @@ class SupplierService
         }
 
         return false;
-    }
-
-    public function getInventory(int $supplierId): ?Inventory
-    {
-        return $this->getSupplierById($supplierId)->inventory;
     }
 }

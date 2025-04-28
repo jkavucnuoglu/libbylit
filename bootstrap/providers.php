@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Domains\Supplier\Providers\SupplierServiceProvider;
+
 use App\Providers\AppServiceProvider;
 use App\Providers\FortifyServiceProvider;
 use App\Providers\JetstreamServiceProvider;
 use App\Providers\Filament\AdminPanelProvider;
 
-use App\Domains\Inventory\Providers\SupplierServiceProvider;
 
 return [
     AppServiceProvider::class,

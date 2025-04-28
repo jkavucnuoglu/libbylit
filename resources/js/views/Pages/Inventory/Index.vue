@@ -3,7 +3,7 @@ import AppLayout from "@/views/Layouts/AppLayout.vue";
 import {useSeoMetaTags} from "@/views/Composables/useSeoMetaTags.js";
 
 useSeoMetaTags({
-    title: 'Inventory',
+    title: 'ProductInventory',
 })
 </script>
 

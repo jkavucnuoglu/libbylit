@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Domains\Inventory\Providers;
+namespace App\Domains\Supplier\Providers;
 
-use App\Domains\Inventory\Http\Controllers\SupplierController;
-use App\Domains\Inventory\Http\Controllers\InventoryItemController;
-use App\Domains\Inventory\Services\SupplierService;
-use Illuminate\Routing\Route;
+use App\Domains\Supplier\Services\SupplierService;
 use Illuminate\Support\ServiceProvider;
 
 class SupplierServiceProvider extends ServiceProvider

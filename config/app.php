@@ -125,4 +125,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'pagination' => [
+        'default' => [
+            'per_page' => env('APP_PAGINATION_DEFAULT', 3),
+            'options' => env('APP_PAGINATION_OPTIONS', '10,15,25,50,100'),
+        ],
+    ]
 ];

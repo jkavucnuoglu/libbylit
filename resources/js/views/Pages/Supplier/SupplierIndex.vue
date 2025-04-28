@@ -1,45 +1,26 @@
 <script setup>
 import {onMounted, ref} from "vue";
+import {router} from '@inertiajs/vue3'
 import AppLayout from "@/views/Layouts/AppLayout.vue";
 import {useSeoMetaTags} from "@/views/Composables/useSeoMetaTags.js";
 import {Icon} from "@iconify/vue";
 import SimplePagination from "@/views/Components/SimplePagination.vue";
-import Modal from "@/views/Components/Modal.vue";
-import axios from "axios";
-import SupplierAddEditModal from "@/views/Pages/Supplier/SupplierAddEditModal.vue";
+import SupplierViewModal from "@/views/Pages/Supplier/SupplierViewModal.vue";
+import {toast} from "vue-sonner";
+import { debounce } from 'lodash';
 
 useSeoMetaTags({
     title: 'Suppliers',
 })
 
+const props = defineProps({
+    suppliers: Object,
+});
+
+const items = ref(props.suppliers.data || []);
+
 const searchValue = ref('');
-
-const search = () => {
-    if (searchValue.value === '') {
-        pagination.currentPage = 1;
-        pagination.totalPages = Math.ceil(filteredItems.value.length / pagination.perPage);
-        start.value = (pagination.currentPage - 1) * pagination.perPage;
-        end.value = start.value + pagination.perPage;
-
-        pagination.lastPage = pagination.totalPages;
-        filteredItems.value = items.slice(start.value, end.value);
-    }
-
-    filteredItems.value = items.filter(item =>
-        item.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.phone.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.email.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.address.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.website.toLowerCase().includes(searchValue.value.toLowerCase())
-    )
-
-    pagination.currentPage = 1;
-    pagination.totalPages = Math.ceil(filteredItems.value.length / pagination.perPage);
-    start.value = (pagination.currentPage - 1) * pagination.perPage;
-    end.value = start.value + pagination.perPage;
-
-    filteredItems.value = filteredItems.value.slice(start.value, end.value);
-}
+const disableEdit = ref(false);
 
 const addEditSupplierModalActive = ref(false) // showAddEditSupplierModal
 
@@ -48,143 +29,169 @@ const showAddEditSupplierModal = () => {
 }
 
 const closeAddEditSupplierModal = () => {
+    reset();
     addEditSupplierModalActive.value = false
 }
 
-const pagination = {
-    currentPage: 1,
-    perPage: 4,
-    totalPages: 0,
-    firstPage: 1,
-    lastPage: 0,
-}
+const errors = ref({})
 
-const start = ref((pagination.currentPage - 1) * pagination.perPage);
-const end = ref(start + pagination.perPage);
-
-const items = [
-    {
-        id: 1,
-        name: 'Supplier 1',
-        phone: '123-456-7890',
-        email: 'OaWtM@example.com',
-        address: '123 Main St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 2,
-        name: 'Supplier 2',
-        phone: '987-654-3210',
-        email: 'YlTgM@example.com',
-        address: '456 Elm St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 3,
-        name: 'Supplier 3',
-        phone: '555-555-5555',
-        email: 'OaWtM@example.com',
-        address: '789 Oak St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 4,
-        name: 'Supplier 4',
-        phone: '444-444-4444',
-        email: 'YlTgM@example.com',
-        address: '321 Maple St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 5,
-        name: 'Supplier 5',
-        phone: '333-333-3333',
-        email: 'OaWtM@example.com',
-        address: '654 Pine St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 6,
-        name: 'Supplier 6',
-        phone: '222-222-2222',
-        email: 'YlTgM@example.com',
-        address: '987 Cedar St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 7,
-        name: 'Supplier 7',
-        phone: '111-111-1111',
-        email: 'OaWtM@example.com',
-        address: '654 Pine St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 8,
-        name: 'Supplier 8',
-        phone: '999-999-9999',
-        email: 'YlTgM@example.com',
-        address: '321 Maple St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 9,
-        name: 'Supplier 9',
-        phone: '888-888-8888',
-        email: 'OaWtM@example.com',
-        address: '987 Cedar St, Anytown, USA',
-        website: 'https://example.com'
-    },
-    {
-        id: 10,
-        name: 'Supplier 10',
-        phone: '777-777-7777',
-        email: 'YlTgM@example.com',
-        address: '654 Pine St, Anytown, USA',
-        website: 'https://example.com'
-    },
-]
+const pagination = ref(props.suppliers || {
+    current_page: props.suppliers.current_page || 1,
+    per_page: props.suppliers.perPage || 10,
+    total_pages: props.suppliers.lastPage || 1,
+    first_page: 1,
+    last_page: props.suppliers.lastPage || 1,
+})
 
 const filteredItems = ref(items);
 
 const goToPage = (page) => {
-    pagination.currentPage = page;
-
-    filteredItems.value = items.filter(item =>
-        item.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.phone.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.email.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.address.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        item.website.toLowerCase().includes(searchValue.value.toLowerCase())
-    )
-
-    start.value = (page - 1) * pagination.perPage;
-    end.value = start.value + pagination.perPage;
-
-    pagination.totalPages = Math.ceil(filteredItems.value.length / pagination.perPage);
-    pagination.lastPage = pagination.totalPages;
-
-    filteredItems.value = filteredItems.value.slice(start.value, end.value);
+    pagination.value.currentPage = page;
+    router.get(route('suppliers.index'), {
+        page: page,
+        search: searchValue.value,
+        perPage: pagination.value.perPage || 15
+    }, {
+        preserveState: true,
+        replace: true
+    });
 }
 
-const form = ref({})
-const errors = ref({})
+const search = debounce(() => {
+    router.get(route('suppliers.index'), {
+        page: 1,
+        search: searchValue.value,
+        perPage: pagination.value.perPage
+    }, {
+        preserveState: true,
+        replace: true
+    });
+}, 500);
 
-const save = async () => {
-    errors.value = {}
-    try {
-        await axios.post('/api/suppliers', form.value)
-        router.push({ name: 'suppliers.index' })
-    } catch (e) {
-        if (e.response && e.response.data && e.response.data.errors) {
-            errors.value = e.response.data.errors
-        }
+const form = ref({
+    name: '',
+    account_number: '',
+    tax_id: '',
+    email: '',
+    phone: '',
+    url: '',
+    address: {
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: ''
     }
+})
+
+const viewSupplier = (supplier) => {
+    form.value = supplier
+    disableEdit.value = true
+    showAddEditSupplierModal();
+}
+
+const reset = () => {
+    // form.value = {
+    //     name: '',
+    //     account_number: '',
+    //     tax_id: '',
+    //     email: '',
+    //     phone: '',
+    //     url: '',
+    //     address: {
+    //         address_line_1: '',
+    //         address_line_2: '',
+    //         city: '',
+    //         state: '',
+    //         postal_code: '',
+    //         country: ''
+    //     }
+    // }
+    // disableEdit.value = false
+}
+
+const editSupplier = (supplier) => {
+    form.value = supplier
+    disableEdit.value = false
+    showAddEditSupplierModal();
+}
+
+
+const save = async (event) => {
+    if (event?.id) {
+        return router.put(
+            route('suppliers.update', event.id),
+            {
+                name: event.name,
+                email: event.email,
+                phone: event.phone,
+                address: {
+                    address_line_1: event.address.address_line_1,
+                    address_line_2: event.address.address_line_2,
+                    city: event.address.city,
+                    state: event.address.state,
+                    postal_code: event.address.postal_code,
+                    country: event.address.country
+                }
+            },
+            {
+                onSuccess: () => {
+                    closeAddEditSupplierModal();
+                    search();
+                    items.value = items.value.map(item => {
+                        if (item.id === event.id) {
+                            return event
+                        }
+                        return item
+                    })
+                }
+            }
+        );
+    }
+
+    router.post(
+        route('suppliers.store'),
+        {
+            name: form.value.name,
+            email: form.value.email,
+            phone: form.value.phone,
+            address: {
+                address_line_1: form.value.address.address_line_1,
+                address_line_2: form.value.address.address_line_2,
+                city: form.value.address.city,
+                state: form.value.address.state,
+                postal_code: form.value.address.postal_code,
+                country: form.value.address.country
+            }
+        },
+        {
+            onSuccess: (response) => {
+                items.value = response.props.suppliers.data
+                pagination.value.current_page = response.props.suppliers.current_page
+                pagination.value.per_page = response.props.suppliers.perPage
+                pagination.value.total_pages = response.props.suppliers.lastPage
+                pagination.value.first_page = 1
+                pagination.value.last_page = response.props.suppliers.lastPage
+                pagination.value.from = response.props.suppliers.from
+                pagination.value.to = response.props.suppliers.to
+                closeAddEditSupplierModal();
+                search();
+
+                toast.success("Supplier created successfully");
+            },
+            onError: (errors) => {
+                for (const key in errors) {
+                    toast.error(errors[key])
+                }
+            }
+        }
+    );
 }
 
 onMounted(() => {
-    search()
-})
+    search();
+});
 
 </script>
 
@@ -198,17 +205,27 @@ onMounted(() => {
             <div class="ml-3">
                 <div class="w-full max-w-sm min-w-[200px] relative flex items-center">
                     <div class="inline-flex rounded-md shadow-xs" role="group">
-<!--                        <button-->
-<!--                            class="flex items-center justify-center px-3 py-3 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700"-->
-<!--                            @click="$dispatch('open-modal', { name: 'add-supplier' })"-->
-<!--                        >-->
-<!--                            Add Supplier-->
-<!--                        </button>-->
-                        <SupplierAddEditModal
-                            :add-edit-supplier-modal-active="addEditSupplierModalActive"
+                        <SupplierViewModal
+                            :add-edit-supplier-modal-active="addViewSupplierModalActive"
                             :supplier="form"
-                            @submit:supplier="save"
-                        />
+                            :show-button="items.length > 0"
+                            :button-text="'Create'"
+                            :errors="errors"
+                            :disable-edit="disableEdit"
+                            @show-add-edit-supplier-modal="showAddSupplierModal"
+                            @close-add-edit-supplier-modal="closeAddEditSupplierModal"
+                            @submit="save"
+                        >
+                            <template #button>
+                                <button
+                                    type="button"
+                                    @click="showAddEditSupplierModal"
+                                    class="flex items-center justify-center px-3 py-3 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700"
+                                >
+                                    Create
+                                </button>
+                            </template>
+                        </SupplierViewModal>
                     </div>
                     <div class="relative">
                         <input
@@ -261,6 +278,19 @@ onMounted(() => {
                 </tr>
                 </thead>
                 <tbody>
+                <tr class="hover:bg-slate-50" v-if="!items.length">
+                    <td class="p-4 border-b border-slate-200 py-5 text-center" colspan="6">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-2">No Suppliers Found. </p>
+                            <button
+                                class="'flex items-center justify-center px-1 py-1 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700'"
+                                type="button"
+                                @click="showAddEditSupplierModal">
+                                Add Supplier
+                            </button>
+                        </div>
+                    </td>
+                </tr>
                 <tr class="hover:bg-slate-50" v-for="(item, index) in filteredItems" :key="index">
                     <td class="p-4 border-b border-slate-200 py-5">
                         <p class="block font-semibold text-sm text-slate-800">{{ item.id }}</p>
@@ -275,15 +305,19 @@ onMounted(() => {
                         <p class="text-sm text-slate-500">{{ item.email }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.website }}</p>
+                        <p class="text-sm text-slate-500">{{ item.url }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
                         <div class="flex justify-end">
-                            <a :href="`/suppliers/${item.id}/edit`" class="block px-2 py-2 text-sm text-gray-700"
+                            <button @click="viewSupplier(item)" class="block px-2 py-2 text-sm text-gray-700"
+                                    role="menuitem" tabindex="-1" :id="'menu-item-' + index">
+                                <Icon icon="lucide:eye" class="w-4 h-4 text-fuchsia-500"/>
+                            </button>
+                            <button @click="editSupplier(item)" class="block px-2 py-2 text-sm text-gray-700"
                                role="menuitem" tabindex="-1" :id="'menu-item-' + index">
                                 <Icon icon="lucide:edit" class="w-4 h-4 text-blue-500"/>
-                            </a>
-                            <form method="post" action="`/suppliers/${item.id}/delete`">
+                            </button>
+                            <form method="post" :action="`/suppliers/${item.id}/delete`">
                                 <button
                                     class="block px-2 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
                                     :id="'menu-item-' + index">
@@ -297,11 +331,7 @@ onMounted(() => {
             </table>
         </div>
         <SimplePagination
-            :current-page="pagination.currentPage"
-            :per-page="pagination.perPage"
-            :total-pages="pagination.totalPages"
-            :first-page="pagination.firstPage"
-            :last-page="pagination.lastPage"
+            :config="pagination"
             @update:current-page="goToPage"
         />
     </AppLayout>

@@ -26,23 +26,17 @@ const navigationConfig = [
         ],
     },
     {
-        label: 'Inventory',
+        label: 'Products',
         items: [
             {name: 'Suppliers', icon: 'lucide:truck', route: 'suppliers.index'},
-            {name: 'Inventory', icon: 'lucide:boxes', route: 'inventory.index'},
-        ],
-    },
-    {
-        label: 'Research and Development',
-        items: [
-            {name: 'Testing Log', icon: 'lucide:list-check', route: 'inventory.index'},
+            {name: 'Products', icon: 'lucide:boxes', route: 'products.index'},
         ],
     },
     {
         label: 'Production',
         items: [
             {name: 'Bill of Materials', icon: 'arcticons:reciper', route: 'suppliers.index'},
-            {name: 'Batches', icon: 'lucide:boxes', route: 'inventory.index'},
+            {name: 'Batches', icon: 'lucide:boxes', route: 'products.index'},
         ],
     },
     // {

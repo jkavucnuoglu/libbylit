@@ -1,6 +1,6 @@
 <?php
 
-use App\Domains\Inventory\Http\Controllers\SupplierController;
+use App\Domains\Supplier\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -10,12 +10,13 @@ Route::group([
 ], function () {
 
     Route::group([
-        'prefix' => 'inventory',
+        'prefix' => 'suppliers',
         'middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified'],
         'name' => 'inventory.',
     ], function () {
+        Route::get('', [SupplierController::class, 'list'])->name('index');
         Route::post('', [SupplierController::class, 'store'])->name('store');
-        Route::put('{id}', [SupplierController::class, 'update'])->name('update');
-        Route::delete('{id}', [SupplierController::class, 'destroy'])->name('destroy');
+        Route::put('{supplier}', [SupplierController::class, 'update'])->name('update');
+        Route::delete('{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
     });
 });
