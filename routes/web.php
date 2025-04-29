@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\InventoryController;
-use Illuminate\Support\Facades\Route;
+use App\Domains\Product\Domains\Inventory\Http\Controllers\ProductInventoryController;
+use App\Domains\Product\Http\Controllers\ProductController;
+use App\Domains\Supplier\Http\Controllers\SupplierController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\User\OauthController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\User\LoginLinkController;
+use App\Http\Controllers\User\OauthController;
+use App\Http\Controllers\WelcomeController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'home'])->name('home');
 
@@ -31,7 +33,18 @@ Route::prefix('auth')->group(
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::group([
+        'prefix' => 'suppliers',
+    ], function () {
+        Route::get('', [SupplierController::class, 'index'])->name('suppliers.index');
+        Route::post('', [SupplierController::class, 'store'])->name('suppliers.store');
+        Route::put('{id}', [SupplierController::class, 'update'])->name('suppliers.update');
+        Route::delete('{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+    });
+
+    Route::get('/products', [SupplierController::class, 'index'])->name('products.index');
+    Route::get('/rnd', [SupplierController::class, 'index'])->name('rnd.index');
+    Route::get('/bom', [SupplierController::class, 'index'])->name('bom.index');
 
     Route::delete('/auth/destroy/{provider}', [OauthController::class, 'destroy'])->name('oauth.destroy');
 
