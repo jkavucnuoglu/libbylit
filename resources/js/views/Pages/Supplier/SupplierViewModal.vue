@@ -49,8 +49,7 @@ const emit = defineEmits(['showAddEditSupplierModal', 'closeAddEditSupplierModal
 const showAddEditSupplierModal = () => emit('showAddEditSupplierModal');
 const closeAddEditSupplierModal = () => emit('closeAddEditSupplierModal');
 const onSubmit = () => {
-    console.log('Form submitted:', formValues);
-    emit('submit', formValues);
+    emit('submit', { ...formValues });
 }
 
 // Validations
@@ -104,11 +103,13 @@ const validatePostalCode = (value) => {
         <template #modal-body>
             <form>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Supplier Name <span
+                    <label class="block mb-1 text-sm text-slate-700">Supplier Name <span
                         class="text-xs text-red-500">*</span></label>
                     <div class="mt-2">
                         <div
-                            class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                            class="flex items-center rounded-md  pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                            :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                        >
                             <Field v-model="formValues.name"
                                    name="name"
                                    type="text"
@@ -116,7 +117,7 @@ const validatePostalCode = (value) => {
                                    :disabled="disableEdit"
                                    placeholder="ACME, Inc."
                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus:outline-none"
-                                   :class="{'cursor-not-allowed': disableEdit}"
+                                   :class="{'text-slate-700': disableEdit}"
                                    required
                             />
                         </div>
@@ -124,10 +125,12 @@ const validatePostalCode = (value) => {
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Account Number</label>
+                    <label class="block mb-1 text-sm text-slate-700">Account Number</label>
                     <div class="mt-2">
                         <div
-                            class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                            class="flex items-center rounded-md pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                            :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                        >
                             <Field v-model="formValues.account_number"
                                    name="account_number"
                                    type="text"
@@ -135,7 +138,7 @@ const validatePostalCode = (value) => {
                                    placeholder="1236325654-41545"
                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus:outline-none"
                                    :disabled="disableEdit"
-                                   :class="{'cursor-not-allowed': disableEdit}"
+                                   :class="{'text-slate-700': disableEdit}"
                                    required
                             />
                         </div>
@@ -143,10 +146,12 @@ const validatePostalCode = (value) => {
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Tax ID</label>
+                    <label class="block mb-1 text-sm text-slate-700">Tax ID</label>
                     <div class="mt-2">
                         <div
-                            class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                            class="flex items-center rounded-md pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                            :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                        >
                             <Field v-model="formValues.tax_id"
                                    name="tax_id"
                                    type="text"
@@ -154,7 +159,7 @@ const validatePostalCode = (value) => {
                                    placeholder="777777777"
                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus:outline-none"
                                    :disabled="disableEdit"
-                                   :class="{'cursor-not-allowed': disableEdit}"
+                                   :class="{'text-slate-700': disableEdit}"
                                    required
                             />
                         </div>
@@ -162,10 +167,12 @@ const validatePostalCode = (value) => {
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Email Address</label>
+                    <label class="block mb-1 text-sm text-slate-700">Email Address</label>
                     <div class="mt-2">
                         <div
-                            class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                            class="flex items-center rounded-md pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                            :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                        >
                             <Field v-model="formValues.email"
                                    name="email"
                                    type="email"
@@ -173,7 +180,7 @@ const validatePostalCode = (value) => {
                                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus:outline-none"
                                    :rules="validateEmail"
                                    :disabled="disableEdit"
-                                   :class="{'cursor-not-allowed': disableEdit}"
+                                   :class="{'text-slate-700': disableEdit}"
                                    required
                             />
                         </div>
@@ -181,9 +188,11 @@ const validatePostalCode = (value) => {
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Phone Number</label>
+                    <label class="block mb-1 text-sm text-slate-700">Phone Number</label>
                     <div
-                        class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                        class="flex items-center rounded-md  pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                        :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                    >
                         <Field
                             name="phone"
                             v-model="formValues.phone"
@@ -199,9 +208,11 @@ const validatePostalCode = (value) => {
                     <ErrorMessage name="phone" class="text-red-500 text-sm"/>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Website URL</label>
+                    <label class="block mb-1 text-sm text-slate-700">Website URL</label>
                     <div
-                        class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200">
+                        class="flex items-center rounded-md  pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                        :class="{'bg-slate-100 cursor-not-allowed ': disableEdit, 'bg-white': !disableEdit}"
+                    >
                         <Field
                             name="url"
                             v-model="formValues.url"
@@ -215,7 +226,7 @@ const validatePostalCode = (value) => {
                     <ErrorMessage name="url" class="text-red-500 text-sm"/>
                 </div>
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm text-slate-500">Address</label>
+                    <label class="block mb-1 text-sm text-slate-700">Address</label>
                     <div class="mt-2">
                         <div
                             class="flex flex-grow items-center  bg-white">
@@ -225,18 +236,18 @@ const validatePostalCode = (value) => {
                                 type="text"
                                 placeholder="123 Main Street"
                                 :rules="validateAddressLine1"
-                                class="block min-w-0 grow py-1.5 px-3 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block min-w-0 grow py-1.5 px-3 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                                 :disabled="disableEdit"
-                                :class="{'cursor-not-allowed': disableEdit}"
                                 required
                             />
                             <Field
                                 name="address_line_2"
                                 v-model="formValues.address.address_line_2"
                                 placeholder="Apt, Suite, etc."
-                                class="block min-w-0 w-1/8 grow py-1.5 px-3 rounded-md mb-1 outline-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block min-w-0 w-1/8 grow py-1.5 px-3 rounded-md mb-1 outline-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                                 :disabled="disableEdit"
-                                :class="{'cursor-not-allowed': disableEdit}"
                             />
                         </div>
                         <div
@@ -246,9 +257,9 @@ const validatePostalCode = (value) => {
                                 v-model="formValues.address.city"
                                 placeholder="City"
                                 :rules="validateCity"
-                                class="block min-w-0 grow py-1.5 px-3 w-3/5 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block min-w-0 grow py-1.5 px-3 w-3/5 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
                                 :disabled="disableEdit"
-                                :class="{'cursor-not-allowed': disableEdit}"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                                 required
                             />
                             <Field
@@ -259,8 +270,8 @@ const validatePostalCode = (value) => {
                                 maxlength="2"
                                 :rules="validateState"
                                 :disabled="disableEdit"
-                                :class="{'cursor-not-allowed': disableEdit}"
-                                class="block w-1/8 min-w-0 grow py-1.5 px-3 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block w-1/8 min-w-0 grow py-1.5 px-3 mr-2 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                             />
                             <Field
                                 name="postal_code"
@@ -269,20 +280,20 @@ const validatePostalCode = (value) => {
                                 maxlength="10"
                                 type="number"
                                 placeholder="Postal Code / Zip Code"
-                                class="block min-w-0 grow py-1.5 px-3 rounded-md mb-1 mr-2 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block min-w-0 grow py-1.5 px-3 rounded-md mb-1 mr-2 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                                 :disabled="disableEdit"
-                                :class="{'cursor-not-allowed': disableEdit}"
                             />
                             <Field
                                 name="country"
                                 type="text"
                                 v-model="formValues.address.country"
                                 placeholder="Country"
-                                class="block min-w-0 grow py-1.5 px-3 w-1/5 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-red-200"
+                                class="block min-w-0 grow py-1.5 px-3 w-1/5 rounded-md mb-1 outline-1 -outline-offset-1 outline-gray-300 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-slate-500"
                                 :rules="validateCountry"
                                 :disabled="disableEdit"
                                 required
-                                :class="{'cursor-not-allowed': disableEdit}"
+                                :class="{'bg-slate-100 cursor-not-allowed text-slate-700': disableEdit, 'bg-white': !disableEdit}"
                             />
                         </div>
 

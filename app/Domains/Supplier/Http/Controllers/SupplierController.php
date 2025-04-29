@@ -7,13 +7,15 @@ use App\Domains\Supplier\Models\Supplier;
 use App\Domains\Supplier\Services\SupplierService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SupplierController extends Controller
 {
     public function __construct(private SupplierService $supplierService)
-    {}
+    {
+    }
 
     public function index(Request $request)
     {
@@ -28,29 +30,19 @@ class SupplierController extends Controller
         return $this->index($request);
     }
 
-    public function update($supplier, Request $request)
+    public function update(Supplier $id, SupplierRequest $request)
     {
-        $this->supplierService->updateSupplier($supplier, $request->all());
+        $this->supplierService->updateSupplier($id, $request->all());
         return $this->index($request);
     }
 
-    public function edit($id)
+    public function destroy(Supplier $id): RedirectResponse
     {
-        return Inertia::render('Supplier/SupplierEdit', [
-            'supplierId' => $id,
-        ]);
-    }
+        $id->delete();
 
-    public function show($id)
-    {
-        return Inertia::render('Supplier/SupplierShow', [
-            'supplierId' => $id,
+        return redirect()->back()->with([
+            'message' => 'Supplier deleted successfully',
+            'alert-type' => 'success'
         ]);
-    }
-
-    public function list(): JsonResponse
-    {
-        $suppliers = Supplier::all();
-        return response()->json($suppliers);
     }
 }

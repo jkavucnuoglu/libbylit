@@ -127,7 +127,7 @@ return [
 
     'pagination' => [
         'default' => [
-            'per_page' => env('APP_PAGINATION_DEFAULT', 3),
+            'per_page' => env('APP_PAGINATION_DEFAULT', 15),
             'options' => env('APP_PAGINATION_OPTIONS', '10,15,25,50,100'),
         ],
     ]

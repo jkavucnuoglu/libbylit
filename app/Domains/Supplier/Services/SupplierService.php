@@ -43,10 +43,8 @@ class SupplierService
         return Supplier::create($data);
     }
 
-    public function updateSupplier($supplier, array $data): ?Supplier
+    public function updateSupplier(Supplier $supplier, array $data): ?Supplier
     {
-        $supplier = Supplier::find($supplier);
-
         if (!$supplier) {
             throw new Exception('Supplier not found.');
         }
@@ -56,12 +54,10 @@ class SupplierService
         return $supplier;
     }
 
-    public function deleteSupplier(int $id): bool
+    public function deleteSupplier(Supplier $id): bool
     {
-        $supplier = $this->getSupplierById($id);
-
-        if ($supplier) {
-            return $supplier->delete();
+        if ($id) {
+            return $id->delete();
         }
 
         return false;

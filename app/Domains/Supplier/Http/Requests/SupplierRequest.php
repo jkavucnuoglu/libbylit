@@ -15,18 +15,21 @@ class SupplierRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'account_id' => 'nullable|string|max:50',
+            'account_number' => 'nullable|string|max:50',
             'tax_id' => 'nullable|string|max:50',
-            'email' => 'required|email|max:255|unique:suppliers,email',
+            'email' => 'required|email|max:255|unique:suppliers,email, ' . $this->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|array',
             'address.address_line_1' => 'required_if:address,not_null|string|max:255',
             'address.address_line_2' => 'nullable|string|max:255',
             'address.city' => 'required_if:address,not_null|string|max:100',
             'address.state' => 'required_if:address,not_null|string|max:100',
-            'address.postal_code' => 'required_if:address,not_null|string|max:20',
+            'address.postal_code' => [
+                'required_if:address,not_null',
+                'regex:/^\d{5}(-\d{4})?$/',
+            ],
             'address.country' => 'required_if:address,not_null|string|max:100',
-            'url' => 'nullable|url|max:255',
+            'url' => 'nullable|string|max:255',
         ];
     }
 }

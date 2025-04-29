@@ -7,7 +7,7 @@ import {Icon} from "@iconify/vue";
 import SimplePagination from "@/views/Components/SimplePagination.vue";
 import SupplierViewModal from "@/views/Pages/Supplier/SupplierViewModal.vue";
 import {toast} from "vue-sonner";
-import { debounce } from 'lodash';
+import {debounce} from 'lodash';
 
 useSeoMetaTags({
     title: 'Suppliers',
@@ -91,30 +91,31 @@ const viewSupplier = (supplier) => {
     showAddEditSupplierModal();
 }
 
-const reset = () => {
-    // form.value = {
-    //     name: '',
-    //     account_number: '',
-    //     tax_id: '',
-    //     email: '',
-    //     phone: '',
-    //     url: '',
-    //     address: {
-    //         address_line_1: '',
-    //         address_line_2: '',
-    //         city: '',
-    //         state: '',
-    //         postal_code: '',
-    //         country: ''
-    //     }
-    // }
-    // disableEdit.value = false
-}
-
 const editSupplier = (supplier) => {
     form.value = supplier
     disableEdit.value = false
     showAddEditSupplierModal();
+}
+
+const reset = () => {
+    form.value = {
+        name: '',
+        account_number: '',
+        tax_id: '',
+        email: '',
+        phone: '',
+        url: '',
+        address: {
+            address_line_1: '',
+            address_line_2: '',
+            city: '',
+            state: '',
+            postal_code: '',
+            country: ''
+        }
+    }
+    errors.value = {}
+    disableEdit.value = false
 }
 
 
@@ -122,29 +123,14 @@ const save = async (event) => {
     if (event?.id) {
         return router.put(
             route('suppliers.update', event.id),
-            {
-                name: event.name,
-                email: event.email,
-                phone: event.phone,
-                address: {
-                    address_line_1: event.address.address_line_1,
-                    address_line_2: event.address.address_line_2,
-                    city: event.address.city,
-                    state: event.address.state,
-                    postal_code: event.address.postal_code,
-                    country: event.address.country
-                }
-            },
+            event,
             {
                 onSuccess: () => {
                     closeAddEditSupplierModal();
                     search();
-                    items.value = items.value.map(item => {
-                        if (item.id === event.id) {
-                            return event
-                        }
-                        return item
-                    })
+                    items.value = items.value.map(item => item.id === event.id ? {...item, ...event} : item);
+
+                    toast.success(`Supplier #${event.id} updated successfully`);
                 }
             }
         );
@@ -152,31 +138,17 @@ const save = async (event) => {
 
     router.post(
         route('suppliers.store'),
+        event,
         {
-            name: form.value.name,
-            email: form.value.email,
-            phone: form.value.phone,
-            address: {
-                address_line_1: form.value.address.address_line_1,
-                address_line_2: form.value.address.address_line_2,
-                city: form.value.address.city,
-                state: form.value.address.state,
-                postal_code: form.value.address.postal_code,
-                country: form.value.address.country
-            }
-        },
-        {
-            onSuccess: (response) => {
-                items.value = response.props.suppliers.data
-                pagination.value.current_page = response.props.suppliers.current_page
-                pagination.value.per_page = response.props.suppliers.perPage
-                pagination.value.total_pages = response.props.suppliers.lastPage
-                pagination.value.first_page = 1
-                pagination.value.last_page = response.props.suppliers.lastPage
-                pagination.value.from = response.props.suppliers.from
-                pagination.value.to = response.props.suppliers.to
+            onSuccess: () => {
                 closeAddEditSupplierModal();
                 search();
+                items.value = items.value.map(item => {
+                    if (item.id === event.id) {
+                        return event
+                    }
+                    return item
+                })
 
                 toast.success("Supplier created successfully");
             },
@@ -187,6 +159,17 @@ const save = async (event) => {
             }
         }
     );
+}
+
+const deleteSupplier = async (supplier) => {
+    if (confirm('Are you sure you want to delete this supplier?')) {
+        router.delete(route('suppliers.destroy', supplier.id), {
+            onSuccess: (response) => {
+                items.value = items.value.filter(item => item.id !== supplier.id)
+                toast.success(response.props.flash.message);
+            }
+        });
+    }
 }
 
 onMounted(() => {
@@ -206,13 +189,13 @@ onMounted(() => {
                 <div class="w-full max-w-sm min-w-[200px] relative flex items-center">
                     <div class="inline-flex rounded-md shadow-xs" role="group">
                         <SupplierViewModal
-                            :add-edit-supplier-modal-active="addViewSupplierModalActive"
+                            :add-edit-supplier-modal-active="addEditSupplierModalActive"
                             :supplier="form"
                             :show-button="items.length > 0"
                             :button-text="'Create'"
-                            :errors="errors"
                             :disable-edit="disableEdit"
-                            @show-add-edit-supplier-modal="showAddSupplierModal"
+                            :errors="errors"
+                            @show-add-edit-supplier-modal="showAddEditSupplierModal"
                             @close-add-edit-supplier-modal="closeAddEditSupplierModal"
                             @submit="save"
                         >
@@ -247,12 +230,22 @@ onMounted(() => {
                 <tr>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Supplier #
+                            Supplier Id
+                        </p>
+                    </th>
+                    <th class="p-4 border-b border-slate-300 bg-slate-50">
+                        <p class="block text-sm font-normal leading-none text-slate-500">
+                            Account #
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
                             Supplier Name
+                        </p>
+                    </th>
+                    <th class="p-4 border-b border-slate-300 bg-slate-50">
+                        <p class="block text-sm font-normal leading-none text-slate-500">
+                            Tax ID
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
@@ -296,7 +289,13 @@ onMounted(() => {
                         <p class="block font-semibold text-sm text-slate-800">{{ item.id }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
+                        <p class="text-sm text-slate-500">{{ item.account_number }}</p>
+                    </td>
+                    <td class="p-4 border-b border-slate-200 py-5">
                         <p class="text-sm text-slate-500">{{ item.name }}</p>
+                    </td>
+                    <td class="p-4 border-b border-slate-200 py-5">
+                        <p class="text-sm text-slate-500">{{ item.tax_id }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
                         <p class="text-sm text-slate-500">{{ item.phone }}</p>
@@ -311,19 +310,22 @@ onMounted(() => {
                         <div class="flex justify-end">
                             <button @click="viewSupplier(item)" class="block px-2 py-2 text-sm text-gray-700"
                                     role="menuitem" tabindex="-1" :id="'menu-item-' + index">
-                                <Icon icon="lucide:eye" class="w-4 h-4 text-fuchsia-500"/>
+                                <Icon icon="lucide:eye" class="w-4 h-4 test-slate-500"/>
                             </button>
-                            <button @click="editSupplier(item)" class="block px-2 py-2 text-sm text-gray-700"
-                               role="menuitem" tabindex="-1" :id="'menu-item-' + index">
+                            <button
+                                @click="editSupplier(item)"
+                                class="block px-2 py-2 text-sm text-gray-700"
+                                role="menuitem" tabindex="-1" :id="'menu-item-' + index">
                                 <Icon icon="lucide:edit" class="w-4 h-4 text-blue-500"/>
                             </button>
-                            <form method="post" :action="`/suppliers/${item.id}/delete`">
-                                <button
-                                    class="block px-2 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                                    :id="'menu-item-' + index">
-                                    <Icon icon="lucide:trash" class="w-4 h-4 text-red-500"/>
-                                </button>
-                            </form>
+                            <button
+                                class="block px-2 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                                :id="'menu-item-' + index"
+                                @click="deleteSupplier(item)"
+                            >
+                                <Icon icon="lucide:trash" class="w-4 h-4 text-red-500"/>
+
+                            </button>
                         </div>
                     </td>
                 </tr>
