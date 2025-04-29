@@ -42,7 +42,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::delete('{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
     });
 
-    Route::get('/products', [SupplierController::class, 'index'])->name('products.index');
+    Route::group([
+        'prefix' => 'products',
+    ], function () {
+        Route::get('', [SupplierController::class, 'index'])->name('products.index');
+    });
     Route::get('/rnd', [SupplierController::class, 'index'])->name('rnd.index');
     Route::get('/bom', [SupplierController::class, 'index'])->name('bom.index');
 

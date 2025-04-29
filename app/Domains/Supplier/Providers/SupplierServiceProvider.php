@@ -2,6 +2,7 @@
 
 namespace App\Domains\Supplier\Providers;
 
+use App\Domains\Supplier\Services\ProductService;
 use App\Domains\Supplier\Services\SupplierService;
 use Illuminate\Support\ServiceProvider;
 

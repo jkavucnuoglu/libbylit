@@ -2,7 +2,6 @@
 
 namespace App\Domains\Supplier\Models;
 
-use App\Domains\Product\Domains\Inventory\Models\ProductInventory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
