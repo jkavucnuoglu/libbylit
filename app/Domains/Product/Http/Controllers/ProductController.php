@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Domains\Product\Http\Controllers;
 
 use App\Domains\Product\Models\Product;
@@ -6,41 +7,67 @@ use App\Domains\Product\Services\ProductService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ProductController extends Controller
 {
-    protected $productService;
-
-    public function __construct(ProductService|StoreProductRequest $productService)
-    {
-        $this->productService = $productService;
-    }
-
-    // List Products
+    public function __construct(protected ProductService $productService)
+    {}
     public function index(Request $request)
     {
-        $products = $this->productService->getProducts($request);
-        return Inertia::render('Product/ProductIndex', ['products' => $products]);
+        return Inertia::render('Products/ProductIndex', [
+            'products' => $this->productService->getProducts($request)
+        ]);
     }
 
-    // Store a new product
-    public function store(StoreProductRequest $request)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): Response
     {
-        $product = $this->productService->createProduct($request->validated());
-        return $this->index($request);
+        return Inertia::render('Products/ProductCreate',[
+            'suppliers' => $this->productService->getAllSuppliers(),
+            'disableEdit' => false,
+        ]);
     }
 
-    // Update an existing product
-    public function update(UpdateProductRequest $request, Product $product)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
-        $this->productService->update($product, $request->validated());
-        return new ProductResource($product);
+        //
     }
 
-    // Delete a product
+    /**
+     * Display the specified resource.
+     */
+    public function show(Product $product)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Product $product)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Product $product)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Product $product)
     {
-        $this->productService->delete($product);
-        return response()->json(['message' => 'Product deleted successfully'], 200);
+        //
     }
 }

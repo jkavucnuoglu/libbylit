@@ -2,180 +2,57 @@
 import {onMounted, ref} from "vue";
 import {router} from '@inertiajs/vue3'
 import AppLayout from "@/views/Layouts/AppLayout.vue";
-import {useSeoMetaTags} from "@/views/Composables/useSeoMetaTags.js";
-import {Icon} from "@iconify/vue";
 import SimplePagination from "@/views/Components/SimplePagination.vue";
-import ProductViewModal from "@/views/Pages/Product/ProductViewModal.vue";
-import {toast} from "vue-sonner";
+import {Icon} from "@iconify/vue";
 import {debounce} from 'lodash';
 
-useSeoMetaTags({
-    title: 'Products',
-})
-
 const props = defineProps({
-    suppliers: Object,
+    products: Object,
+    suppliers: Array,
+    errors: Object,
 });
 
-const items = ref(props.suppliers.data || []);
-
-const searchValue = ref('');
-const disableEdit = ref(false);
-
-const addEditProductModalActive = ref(false) // showAddEditProductModal
-
-const showAddEditProductModal = () => {
-    addEditProductModalActive.value = true
-}
-
-const closeAddEditProductModal = () => {
-    reset();
-    addEditProductModalActive.value = false
-}
-
-const errors = ref({})
-
-const pagination = ref(props.suppliers || {
-    current_page: props.suppliers.current_page || 1,
-    per_page: props.suppliers.perPage || 10,
-    total_pages: props.suppliers.lastPage || 1,
-    first_page: 1,
-    last_page: props.suppliers.lastPage || 1,
-})
-
-const filteredItems = ref(items);
+const pagination = {
+    currentPage: 1,
+    lastPage: 10,
+    total: 100,
+    perPage: 10,
+};
 
 const goToPage = (page) => {
-    pagination.value.currentPage = page;
-    router.get(route('suppliers.index'), {
-        page: page,
-        search: searchValue.value,
-        perPage: pagination.value.perPage || 15
-    }, {
-        preserveState: true,
-        replace: true
-    });
-}
+    pagination.currentPage = page;
+};
+
+const searchValue = ref('');
+const items = ref(props.products.data);
+const filteredItems = ref(items);
+const showProductViewModal = ref(false);
 
 const search = debounce(() => {
-    router.get(route('suppliers.index'), {
-        page: 1,
-        search: searchValue.value,
-        perPage: pagination.value.perPage
-    }, {
-        preserveState: true,
-        replace: true
-    });
-}, 500);
-
-const form = ref({
-    name: '',
-    account_number: '',
-    tax_id: '',
-    email: '',
-    phone: '',
-    url: '',
-    address: {
-        address_line_1: '',
-        address_line_2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: ''
-    }
-})
-
-const viewProduct = (supplier) => {
-    form.value = supplier
-    disableEdit.value = true
-    showAddEditProductModal();
-}
-
-const editProduct = (supplier) => {
-    form.value = supplier
-    disableEdit.value = false
-    showAddEditProductModal();
-}
-
-const reset = () => {
-    form.value = {
-        name: '',
-        account_number: '',
-        tax_id: '',
-        email: '',
-        phone: '',
-        url: '',
-        address: {
-            address_line_1: '',
-            address_line_2: '',
-            city: '',
-            state: '',
-            postal_code: '',
-            country: ''
-        }
-    }
-    errors.value = {}
-    disableEdit.value = false
-}
-
-
-const save = async (event) => {
-    if (event?.id) {
-        return router.put(
-            route('suppliers.update', event.id),
-            event,
-            {
-                onSuccess: () => {
-                    closeAddEditProductModal();
-                    search();
-                    items.value = items.value.map(item => item.id === event.id ? {...item, ...event} : item);
-
-                    toast.success(`Product #${event.id} updated successfully`);
-                }
-            }
-        );
-    }
-
-    router.post(
-        route('suppliers.store'),
-        event,
-        {
-            onSuccess: () => {
-                closeAddEditProductModal();
-                search();
-                items.value = items.value.map(item => {
-                    if (item.id === event.id) {
-                        return event
-                    }
-                    return item
-                })
-
-                toast.success("Product created successfully");
-            },
-            onError: (errors) => {
-                for (const key in errors) {
-                    toast.error(errors[key])
-                }
-            }
-        }
-    );
-}
-
-const deleteProduct = async (supplier) => {
-    if (confirm('Are you sure you want to delete this supplier?')) {
-        router.delete(route('suppliers.destroy', supplier.id), {
-            onSuccess: (response) => {
-                items.value = items.value.filter(item => item.id !== supplier.id)
-                toast.success(response.props.flash.message);
-            }
+    if (searchValue.value.length > 0) {
+        filteredItems.value = items.value.filter(item => {
+            return item.name.toLowerCase().includes(searchValue.value.toLowerCase());
         });
+    } else {
+        filteredItems.value = items.value;
     }
-}
+}, 300);
 
-onMounted(() => {
-    search();
-});
+const showAddEditProductModal = () => {
+    showProductViewModal.value = true;
+};
 
+const hideAddEditProductModal = () => {
+    showProductViewModal.value = false;
+};
+
+const viewProduct = (item) => {
+    router.get(route('products.show', item.id));
+};
+
+const editProduct = (item) => {
+    router.get(route('products.edit', item.id));
+};
 </script>
 
 <template>
@@ -183,33 +60,14 @@ onMounted(() => {
         <div class="w-full flex justify-between items-center mb-3 mt-1 pl-3">
             <div>
                 <h3 class="text-lg font-semibold text-slate-800">Products</h3>
-                <p class="text-slate-500">Overview of the suppliers.</p>
+                <p class="text-slate-500">Overview of the products.</p>
             </div>
             <div class="ml-3">
                 <div class="w-full max-w-sm min-w-[200px] relative flex items-center">
-                    <div class="inline-flex rounded-md shadow-xs" role="group">
-                        <ProductViewModal
-                            :add-edit-supplier-modal-active="addEditProductModalActive"
-                            :supplier="form"
-                            :show-button="items.length > 0"
-                            :button-text="'Create'"
-                            :disable-edit="disableEdit"
-                            :errors="errors"
-                            @show-add-edit-supplier-modal="showAddEditProductModal"
-                            @close-add-edit-supplier-modal="closeAddEditProductModal"
-                            @submit="save"
-                        >
-                            <template #button>
-                                <button
-                                    type="button"
-                                    @click="showAddEditProductModal"
-                                    class="flex items-center justify-center px-3 py-3 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700"
-                                >
-                                    Create
-                                </button>
-                            </template>
-                        </ProductViewModal>
-                    </div>
+                    <a href="/products/create"
+                       class="flex items-center justify-center px-2 py-1 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700">
+                        Add Product
+                    </a>
                     <div class="relative">
                         <input
                             class="w-full pr-11 h-8 pl-3 py-2 bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400"
@@ -230,37 +88,42 @@ onMounted(() => {
                 <tr>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Product Id
+                            #
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Account #
+                            Supplier
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Product Name
+                            Name
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Tax ID
+                            SKU
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Phone Number
+                            UPC
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Email Address
+                            Category
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50">
                         <p class="block text-sm font-normal leading-none text-slate-500">
-                            Website
+                            Price
+                        </p>
+                    </th>
+                    <th class="p-4 border-b border-slate-300 bg-slate-50">
+                        <p class="block text-sm font-normal leading-none text-slate-500">
+                            Active
                         </p>
                     </th>
                     <th class="p-4 border-b border-slate-300 bg-slate-50 flex justify-end">
@@ -271,16 +134,15 @@ onMounted(() => {
                 </tr>
                 </thead>
                 <tbody>
-                <tr class="hover:bg-slate-50" v-if="!items.length">
-                    <td class="p-4 border-b border-slate-200 py-5 text-center" colspan="6">
+                <tr class="hover:bg-slate-50" v-if="!filteredItems.length">
+                    <td class="p-4 border-b border-slate-200 py-5 text-center" colspan="9">
                         <div>
                             <p class="text-sm text-slate-500 mb-2">No Products Found. </p>
-                            <button
+                            <a href="/products/create"
                                 class="'flex items-center justify-center px-1 py-1 h-8 mr-2 text-sm font-medium text-gray-500 bg-white border border-slate-200 rounded hover:bg-gray-100 hover:text-gray-700'"
-                                type="button"
-                                @click="showAddEditProductModal">
+                            >
                                 Add Product
-                            </button>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -289,22 +151,22 @@ onMounted(() => {
                         <p class="block font-semibold text-sm text-slate-800">{{ item.id }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.account_number }}</p>
-                    </td>
-                    <td class="p-4 border-b border-slate-200 py-5">
                         <p class="text-sm text-slate-500">{{ item.name }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.tax_id }}</p>
+                        <p class="text-sm text-slate-500">{{ item.sku }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.phone }}</p>
+                        <p class="text-sm text-slate-500">{{ item.upc }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.email }}</p>
+                        <p class="text-sm text-slate-500">{{ item.category }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
-                        <p class="text-sm text-slate-500">{{ item.url }}</p>
+                        <p class="text-sm text-slate-500">{{ item.price }}</p>
+                    </td>
+                    <td class="p-4 border-b border-slate-200 py-5">
+                        <p class="text-sm text-slate-500">{{ item.is_active }}</p>
                     </td>
                     <td class="p-4 border-b border-slate-200 py-5">
                         <div class="flex justify-end">

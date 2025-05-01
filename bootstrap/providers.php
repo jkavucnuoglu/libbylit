@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Domains\Supplier\Providers\SupplierServiceProvider;
+use App\Domains\Supplier\Providers\ProductServiceProvider;
 
 use App\Providers\AppServiceProvider;
 use App\Providers\FortifyServiceProvider;
@@ -18,4 +19,5 @@ return [
 
     // Domains
     SupplierServiceProvider::class,
+    ProductServiceProvider::class,
 ];

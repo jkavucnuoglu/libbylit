@@ -26,6 +26,7 @@
     "sentry/sentry-laravel": "^4.10",
     "spatie/laravel-sitemap": "^7.3",
     "symfony/mailer": "~7.1.0",
+    "thejano/laravel-domain-driven-design": "^1.1",
     "tightenco/ziggy": "^2.0"
   },
   "require-dev": {

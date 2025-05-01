@@ -2,20 +2,12 @@
 
 namespace App\Domains\Supplier\Models;
 
+use App\Domains\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model
 {
-    public static function boot()
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            $model->tenant_id = auth()->user()->id;
-        });
-    }
-
-
     protected $fillable = [
         'name',
         'account_number',
@@ -33,8 +25,8 @@ class Supplier extends Model
         'status' => 'boolean',
     ];
 
-    public function inventory(): HasMany
+    public function products(): HasMany
     {
-        return $this->hasMany(ProductInventory::class);
+        return $this->hasMany(Product::class);
     }
 }

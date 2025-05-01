@@ -3,63 +3,55 @@
 namespace App\Domains\Product\Services;
 
 use App\Domains\Product\Models\Product;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Domains\Supplier\Models\Supplier;
+use Illuminate\Support\Collection;
 
 class ProductService
 {
-    public function __construct()
+    public function getProducts($request)
     {
+        return Product::query()
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+                $query->orWhere('sku', 'like', '%' . $request->search . '%');
+                $query->orWhere('description', 'like', '%' . $request->search . '%');
+            })
+            ->latest()
+            ->paginate(10);
     }
 
-    public function getProducts(Request $request): LengthAwarePaginator
-    {
-        $query = Product::query();
-
-        if ($request->has('search') && $request->get('search') !== '' && $request->get('search') !== null) {
-            $query->where('name', 'like', $request->get('search') . '%');
-            $query->orWhere('email', 'like', $request->get('search') . '%');
-            $query->orWhere('phone', 'like', $request->get('search') . '%');
-            $query->orWhere('address', 'like', $request->get('search') . '%');
-            $query->orWhere('url', 'like', $request->get('search') . '%');
-        }
-
-        return $query->paginate(
-            $request->get('per_page', config('app.pagination.default.per_page')),
-            ['*'],
-            'page',
-            $request->get('page', 1)
-        );
-    }
-
-    public function getProductById(int $id): ?Product
-    {
-        return Product::find($id);
-    }
-
-    public function createProduct(array $data): Product
+    public function createProduct(array $data)
     {
         return Product::create($data);
     }
 
-    public function updateProduct(Product $supplier, array $data): ?Product
+    public function updateProduct(Product $product, array $data)
     {
-        if (!$supplier) {
-            throw new Exception('Product not found.');
-        }
-
-        $supplier->update($data);
-
-        return $supplier;
+        return $product->update($data);
     }
 
-    public function deleteProduct(Product $id): bool
+    public function deleteProduct(Product $product)
     {
-        if ($id) {
-            return $id->delete();
-        }
+        return $product->delete();
+    }
 
-        return false;
+    public function getProductById(int $id)
+    {
+        return Product::find($id);
+    }
+
+    public function getProductBySku(string $sku)
+    {
+        return Product::where('sku', $sku)->first();
+    }
+
+    public function getProductByName(string $name)
+    {
+        return Product::where('name', $name)->first();
+    }
+
+    public function getAllSuppliers(): Collection
+    {
+        return Supplier::get(['name', 'id']);
     }
 }
