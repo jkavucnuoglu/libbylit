@@ -29,14 +29,14 @@ const navigationConfig = [
         label: 'Products',
         items: [
             {name: 'Suppliers', icon: 'lucide:truck', route: 'suppliers.index'},
-            {name: 'Products', icon: 'lucide:boxes', route: 'products.index'},
+            {name: 'Materials', icon: 'lucide:boxes', route: 'materials.index'},
         ],
     },
     {
         label: 'Production',
         items: [
             {name: 'Bill of Materials', icon: 'arcticons:reciper', route: 'suppliers.index'},
-            {name: 'Batches', icon: 'lucide:boxes', route: 'products.index'},
+            {name: 'Batches', icon: 'lucide:boxes', route: 'materials.index'},
         ],
     },
     // {

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Domains\Product\Domains\Inventory\Http\Controllers\ProductInventoryController;
-use App\Domains\Product\Http\Controllers\ProductController;
+use App\Domains\Material\Domains\Inventory\Http\Controllers\MaterialInventoryController;
+use App\Domains\Material\Http\Controllers\MaterialController;
 use App\Domains\Supplier\Http\Controllers\SupplierController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -43,22 +43,25 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
     Route::group([
-        'prefix' => 'products',
+        'prefix' => 'materials',
     ], function () {
-        Route::get('', [ProductController::class, 'index'])
-            ->name('products.index');
-        Route::get('create', [ProductController::class, 'create'])
-            ->name('products.create');
-        Route::post('', [ProductController::class, 'store'])
-            ->name('products.store');
-        Route::get('{id}', [ProductController::class, 'show'])
-            ->name('products.show');
-        Route::get('{id}/edit', [ProductController::class, 'edit'])
-            ->name('products.edit');
-        Route::put('{id}', [ProductController::class, 'update'])
-            ->name('products.update');
-        Route::delete('{id}', [ProductController::class, 'destroy'])
-            ->name('products.destroy');
+        Route::get('', [MaterialController::class, 'index'])
+            ->name('materials.index');
+        Route::get('create', [MaterialController::class, 'create'])
+            ->name('materials.create');
+        Route::post('', [MaterialController::class, 'store'])
+            ->name('materials.store');
+        Route::get('{id}', [MaterialController::class, 'show'])
+            ->name('materials.show');
+        Route::get('{id}/edit', [MaterialController::class, 'edit'])
+            ->name('materials.edit');
+        Route::post('{id}', [MaterialController::class, 'update'])
+            ->name('materials.update');
+        Route::post('{id}', [MaterialController::class, 'update'])
+            ->name('materials.update');
+
+        Route::delete('{id}', [MaterialController::class, 'destroy'])
+            ->name('materials.destroy');
     });
 
 

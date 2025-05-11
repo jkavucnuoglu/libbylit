@@ -1,12 +1,28 @@
 <?php
 
-namespace App\Domains\Product\Models;
+namespace App\Domains\Material\Models;
 
 use App\Domains\Supplier\Models\Supplier;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Rinvex\Categories\Traits\Categorizable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model
+class Material extends Model implements HasMedia
 {
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($material) {
+            $material->tenant_id = auth()->user()->id;
+            $material->uuid = (string) Str::uuid();
+        });
+    }
+
+    use Categorizable;
+    use InteractsWithMedia;
     protected $fillable = [
         'name',
         'sku',
@@ -16,7 +32,7 @@ class Product extends Model
         'category',
         'image',
         'price',
-        'stripe_product_id',
+        'stripe_material_id',
         'stripe_price_id',
         'weight',
         'weight_unit',
@@ -36,6 +52,7 @@ class Product extends Model
         'height' => 'decimal:2',
         'depth' => 'decimal:2',
         'price' => 'decimal:2',
+        'image' => 'string',
     ];
 
     public function supplier()

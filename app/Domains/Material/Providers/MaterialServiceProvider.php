@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domains\Product\Providers;
+namespace App\Domains\Material\Providers;
 
-use App\Domains\Product\Services\ProductService;
+use App\Domains\Material\Services\MaterialService;
 use Illuminate\Support\ServiceProvider;
 
-class ProductServiceProvider extends ServiceProvider
+class MaterialServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
@@ -15,8 +15,8 @@ class ProductServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(ProductService::class, function ($app) {
-            return new ProductService();
+        $this->app->singleton(MaterialService::class, function ($app) {
+            return new MaterialService();
         });
     }
 }

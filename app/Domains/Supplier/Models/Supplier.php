@@ -2,7 +2,7 @@
 
 namespace App\Domains\Supplier\Models;
 
-use App\Domains\Product\Models\Product;
+use App\Domains\Product\Models\Material;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -27,6 +27,6 @@ class Supplier extends Model
 
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Material::class);
     }
 }

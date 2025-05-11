@@ -11,28 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->uuid();
             $table->integer('tenant_id')->index();
+            $table->string('name');
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')
                 ->onDelete('cascade');
-            $table->string('name');
             $table->string('sku')->nullable()->unique();
             $table->string('upc')->nullable();
-            $table->string('description')->nullable();
             $table->string('category')->nullable();
             $table->string('image')->nullable();
+            $table->string('description')->nullable();
+            $table->decimal('min_stock', 10, 2)->default(0);
+            $table->decimal('max_stock', 10, 2)->default(0);
+            $table->string('stock_unit')->default('g');
+            $table->decimal('width', 10, 2)->default(0);
+            $table->decimal('height', 10, 2)->default(0);
+            $table->decimal('depth', 10, 2)->default(0);
+            $table->string('dimensions_unit')->default(0);
             $table->decimal('price', 10, 2)->default(0);
             $table->string('stripe_product_id')->nullable();
             $table->string('stripe_price_id')->nullable();
-            $table->integer('weight')->default(0);
-            $table->string('weight_unit')->default('g');
-            $table->string('width')->default(0);
-            $table->string('height')->default(0);
-            $table->string('length')->default(0);
-            $table->string('depth')->default(0);
-            $table->string('dimension_unit')->default('cm');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_taxable')->default(false);
             $table->timestamps();
